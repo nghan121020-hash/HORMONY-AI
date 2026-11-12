@@ -23,11 +23,7 @@ const upload = multer({
 app.use(cors());
 app.use(express.json({ limit: "20kb" }));
 
-app.use(express.static(
-  path.join(process.env.USERPROFILE || process.cwd(),
-  "Desktop", "HARMONY AL")
-));
-
+app.use(express.static(__dirname));
 async function startServer() {
   if (!process.env.GEMINI_API_KEY) {
     throw new Error("Không tìm thấy GEMINI_API_KEY trong .env");
