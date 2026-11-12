@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HORMONY AI - Đồng hành cùng bạn</title>
+
 <style>
 :root {
   --purple:#7057f5;
@@ -14,16 +15,24 @@
   --orange:#ffb443;
   --dark:#272343;
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
+
+* {
+  box-sizing:border-box;
+}
+
+html {
+  scroll-behavior:smooth;
+}
+
+body {
   margin:0;
   font-family:Arial,sans-serif;
   color:var(--dark);
   background:linear-gradient(135deg,#f2edff,#fff0f5,#eafaff);
   min-height:100vh;
 }
-header{
+
+header {
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -35,18 +44,41 @@ header{
   z-index:10;
   box-shadow:0 3px 15px #6650a010;
 }
-.logo{font-size:24px;font-weight:900;color:var(--purple)}
-.logo span{color:var(--pink)}
-nav{display:flex;gap:20px;flex-wrap:wrap}
-nav a{
+
+.logo {
+  font-size:24px;
+  font-weight:900;
+  color:var(--purple);
+}
+
+.logo span {
+  color:var(--pink);
+}
+
+nav {
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+nav a {
   text-decoration:none;
   color:#555;
   font-weight:bold;
   font-size:14px;
 }
-nav a:hover{color:var(--purple)}
-main{max-width:1150px;margin:auto;padding:35px 22px}
-.hero{
+
+nav a:hover {
+  color:var(--purple);
+}
+
+main {
+  max-width:1150px;
+  margin:auto;
+  padding:35px 22px;
+}
+
+.hero {
   padding:48px;
   border-radius:30px;
   color:white;
@@ -55,7 +87,8 @@ main{max-width:1150px;margin:auto;padding:35px 22px}
   position:relative;
   overflow:hidden;
 }
-.hero:after{
+
+.hero:after {
   content:"✦";
   position:absolute;
   font-size:180px;
@@ -63,22 +96,37 @@ main{max-width:1150px;margin:auto;padding:35px 22px}
   top:0;
   opacity:.15;
 }
-.tag{
+
+.tag {
   display:inline-block;
   background:#ffffff35;
   padding:9px 16px;
   border-radius:30px;
   font-size:13px;
 }
-.hero h1{font-size:clamp(28px,5vw,45px);margin:20px 0 12px}
-.hero p{line-height:1.8;max-width:650px}
-.section-title{margin:40px 0 20px;font-size:25px}
-.cards{
+
+.hero h1 {
+  font-size:clamp(28px,5vw,45px);
+  margin:20px 0 12px;
+}
+
+.hero p {
+  line-height:1.8;
+  max-width:650px;
+}
+
+.section-title {
+  margin:40px 0 20px;
+  font-size:25px;
+}
+
+.cards {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(205px,1fr));
   gap:18px;
 }
-.card{
+
+.card {
   background:white;
   border-radius:23px;
   padding:23px;
@@ -87,27 +135,45 @@ main{max-width:1150px;margin:auto;padding:35px 22px}
   cursor:pointer;
   transition:.25s;
 }
-.card:hover{
+
+.card:hover {
   transform:translateY(-7px);
   box-shadow:0 15px 30px #7057f533;
 }
-.card .emoji{font-size:36px}
-.card h3{margin:14px 0 8px}
-.card p{font-size:14px;color:#777;line-height:1.6}
-.purple{border-top:5px solid var(--purple)}
-.pink{border-top:5px solid var(--pink)}
-.blue{border-top:5px solid var(--blue)}
-.green{border-top:5px solid var(--green)}
-.orange{border-top:5px solid var(--orange)}
-.panel{
+
+.card .emoji {
+  font-size:36px;
+}
+
+.card h3 {
+  margin:14px 0 8px;
+}
+
+.card p {
+  font-size:14px;
+  color:#777;
+  line-height:1.6;
+}
+
+.purple {border-top:5px solid var(--purple)}
+.pink {border-top:5px solid var(--pink)}
+.blue {border-top:5px solid var(--blue)}
+.green {border-top:5px solid var(--green)}
+.orange {border-top:5px solid var(--orange)}
+
+.panel {
   background:white;
   border-radius:25px;
   padding:27px;
   margin-top:25px;
   box-shadow:0 8px 25px #6250a012;
 }
-.panel h2{margin-top:0}
-button{
+
+.panel h2 {
+  margin-top:0;
+}
+
+button {
   border:0;
   border-radius:14px;
   padding:13px 20px;
@@ -117,8 +183,19 @@ button{
   cursor:pointer;
   transition:.2s;
 }
-button:hover{transform:scale(1.03);filter:brightness(1.08)}
-input,textarea,select{
+
+button:hover {
+  transform:scale(1.03);
+  filter:brightness(1.08);
+}
+
+button:disabled {
+  opacity:.6;
+  cursor:not-allowed;
+  transform:none;
+}
+
+input,textarea,select {
   width:100%;
   padding:13px;
   border:1px solid #ddd;
@@ -126,8 +203,13 @@ input,textarea,select{
   font:inherit;
   margin:8px 0;
 }
-textarea{min-height:100px;resize:vertical}
-.chatbox{
+
+textarea {
+  min-height:100px;
+  resize:vertical;
+}
+
+.chatbox {
   background:#f8f6ff;
   border-radius:15px;
   padding:17px;
@@ -135,49 +217,81 @@ textarea{min-height:100px;resize:vertical}
   line-height:1.7;
   margin:14px 0;
   white-space:pre-wrap;
+  overflow-wrap:anywhere;
 }
-.hidden{display:none}
-.small{font-size:13px;color:#777;line-height:1.7}
-.progress-bg{
+
+.hidden {
+  display:none;
+}
+
+.small {
+  font-size:13px;
+  color:#777;
+  line-height:1.7;
+}
+
+.progress-bg {
   height:13px;
   background:#eee;
   border-radius:20px;
   overflow:hidden;
 }
-.progress-fill{
+
+.progress-fill {
   height:100%;
   width:0;
   background:linear-gradient(90deg,#7057f5,#ff6594);
   transition:width .3s;
 }
-.task{
+
+.task {
   display:flex;
   align-items:center;
   gap:10px;
   padding:9px 0;
 }
-.task input{width:auto;margin:0}
-.task span{flex:1}
-.task input:checked+span{
+
+.task input {
+  width:auto;
+  margin:0;
+}
+
+.task span {
+  flex:1;
+}
+
+.task input:checked+span {
   text-decoration:line-through;
   color:#999;
 }
-footer{
+
+footer {
   text-align:center;
   padding:35px;
   color:#777;
   font-size:13px;
 }
-@media(max-width:650px){
-  header{
+
+@media(max-width:650px) {
+  header {
     align-items:flex-start;
     flex-direction:column;
     gap:13px;
     padding:15px 5%;
   }
-  nav{gap:13px}
-  .hero{padding:28px 23px}
-  .hero:after{right:5px;font-size:100px}
+
+  nav {
+    gap:13px;
+  }
+
+  .hero {
+    padding:28px 23px;
+  }
+
+  .hero:after {
+    right:5px;
+    font-size:100px;
+  }
 }
 </style>
 </head>
@@ -186,6 +300,7 @@ footer{
 
 <header>
   <div class="logo">HORMONY <span>AI ✦</span></div>
+
   <nav>
     <a href="#home">Trang chủ</a>
     <a href="#features">Chức năng</a>
@@ -197,16 +312,23 @@ footer{
 
   <section class="hero" id="home">
     <span class="tag">✦ KHÔNG GIAN HỌC TẬP TÍCH CỰC</span>
+
     <h1>Xin chào! Hôm nay bạn muốn học gì?</h1>
+
     <p>
       Cùng HORMONY AI học tập, phát triển bản thân
       và chăm sóc tinh thần mỗi ngày.
       Mỗi bước tiến nhỏ đều đáng tự hào!
     </p>
-    <button onclick="showModule('study')">Khám phá ngay ✨</button>
+
+    <button onclick="showModule('study')">
+      Khám phá ngay ✨
+    </button>
   </section>
 
-  <h2 class="section-title" id="features">🌈 Khám phá tiện ích</h2>
+  <h2 class="section-title" id="features">
+    🌈 Khám phá tiện ích
+  </h2>
 
   <section class="cards">
 
@@ -242,85 +364,132 @@ footer{
 
   </section>
 
+  <!-- TRỢ LÝ HỌC TẬP -->
+
   <section class="panel hidden" id="study">
-    <h2>📚 Trợ lý học tập</h2>
-    <p>Nhập câu hỏi hoặc kiến thức bạn muốn tìm hiểu.</p>
-    <textarea id="studyQuestion"
-      placeholder="Ví dụ: Giải thích công thức lượng giác lớp 11..."></textarea>
-    <button onclick="askStudy()">Gửi câu hỏi</button>
+    <h2>📚 Trợ lý học tập HORMONY AI</h2>
+
+    <p>
+      Hãy nhập câu hỏi về Toán, Văn, Anh, Lý
+      hoặc bất kỳ kiến thức nào bạn muốn tìm hiểu.
+    </p>
+
+    <textarea
+      id="studyQuestion"
+      placeholder="Ví dụ: Giải thích công thức lượng giác lớp 11..."
+    ></textarea>
+
+    <button id="studyButton" onclick="askStudy()">
+      Gửi câu hỏi ✨
+    </button>
+
     <div class="chatbox" id="studyAnswer">
-      Câu trả lời sẽ hiển thị tại đây.
+      🌈 HORMONY AI sẵn sàng hỗ trợ bạn học tập!
     </div>
+
     <p class="small">
-      Đây là phiên bản giao diện thử nghiệm.
-      Chatbot chưa kết nối AI thực tế.
+      AI có thể mắc lỗi. Hãy kiểm tra lại các kiến thức quan trọng
+      với sách giáo khoa và giáo viên.
     </p>
   </section>
 
-  
-<section class="panel hidden" id="care">
-  <h2>💗 Chăm sóc tinh thần</h2>
-  <p>Không gian an toàn để bạn chia sẻ cảm xúc của mình.</p>
+  <!-- CHĂM SÓC TINH THẦN -->
 
-  <label for="mood">Hôm nay bạn cảm thấy thế nào?</label>
-  <select id="mood">
-    <option value="Vui vẻ">😊 Vui vẻ</option>
-    <option value="Bình thường">🙂 Bình thường</option>
-    <option value="Căng thẳng">😟 Hơi căng thẳng</option>
-    <option value="Buồn hoặc mệt mỏi">💙 Buồn hoặc mệt mỏi</option>
-  </select>
+  <section class="panel hidden" id="care">
+    <h2>💗 Chăm sóc tinh thần</h2>
 
-  <label for="moodNote">💬 Hãy chia sẻ điều đang khiến bạn suy nghĩ:</label>
-  <textarea
-    id="moodNote"
-    placeholder="Ví dụ: Hôm nay mình cảm thấy áp lực vì có nhiều bài tập và sắp đến kỳ kiểm tra."
-    rows="5"
-    style="width:100%;box-sizing:border-box;padding:15px;border-radius:15px;margin:12px 0;border:2px solid #e5c8f5;"
-  ></textarea>
+    <p>
+      Không gian an toàn để bạn chia sẻ cảm xúc của mình.
+    </p>
 
-  <button onclick="checkMood()">Gửi chia sẻ 💗</button>
+    <label for="mood">Hôm nay bạn cảm thấy thế nào?</label>
 
-  <div class="chatbox" id="moodAnswer">
-    Cảm xúc của bạn đều xứng đáng được lắng nghe.
-  </div>
+    <select id="mood">
+      <option value="Vui vẻ">😊 Vui vẻ</option>
+      <option value="Bình thường">🙂 Bình thường</option>
+      <option value="Căng thẳng">😟 Hơi căng thẳng</option>
+      <option value="Buồn hoặc mệt mỏi">💙 Buồn hoặc mệt mỏi</option>
+    </select>
 
-  <p class="small">
-    Nếu khó khăn kéo dài hoặc bạn cảm thấy không an toàn,
-    hãy tìm đến cha mẹ, thầy cô hoặc người lớn đáng tin cậy.
-    HORMONY AI không thay thế chuyên gia tâm lý.
-  </p>
-</section>
+    <label for="moodNote">
+      💬 Hãy chia sẻ điều đang khiến bạn suy nghĩ:
+    </label>
+
+    <textarea
+      id="moodNote"
+      placeholder="Ví dụ: Hôm nay mình cảm thấy áp lực vì có nhiều bài tập và sắp đến kỳ kiểm tra."
+      rows="5"
+    ></textarea>
+
+    <button onclick="checkMood()">
+      Gửi chia sẻ 💗
+    </button>
+
+    <div class="chatbox" id="moodAnswer">
+      Cảm xúc của bạn đều xứng đáng được lắng nghe.
+    </div>
+
+    <p class="small">
+      Nếu khó khăn kéo dài hoặc bạn cảm thấy không an toàn,
+      hãy tìm đến cha mẹ, thầy cô hoặc người lớn đáng tin cậy.
+      HORMONY AI không thay thế chuyên gia tâm lý.
+    </p>
+  </section>
+
+  <!-- KẾ HOẠCH THÔNG MINH -->
 
   <section class="panel hidden" id="plan">
     <h2>🗓️ Kế hoạch thông minh</h2>
+
     <p>Thêm những việc bạn muốn hoàn thành hôm nay.</p>
-    <input id="taskName" placeholder="Ví dụ: Ôn tập Toán 30 phút">
-    <button onclick="addTask()">+ Thêm công việc</button>
+
+    <input
+      id="taskName"
+      placeholder="Ví dụ: Ôn tập Toán 30 phút"
+    >
+
+    <button onclick="addTask()">
+      + Thêm công việc
+    </button>
+
     <div id="taskList"></div>
   </section>
 
+  <!-- TIẾN ĐỘ -->
+
   <section class="panel hidden" id="progress">
     <h2>🚀 Tiến độ của tôi</h2>
+
     <p>Tiến độ hoàn thành công việc của bạn:</p>
+
     <div class="progress-bg">
       <div class="progress-fill" id="progressFill"></div>
     </div>
-    <h3 id="progressText">0 công việc hoàn thành</h3>
+
+    <h3 id="progressText">
+      0/0 công việc hoàn thành
+    </h3>
+
     <p class="small">
       Tiến độ được tính từ danh sách công việc
       trong phiên sử dụng này.
     </p>
   </section>
 
+  <!-- HỖ TRỢ HỌC ĐƯỜNG -->
+
   <section class="panel hidden" id="support">
     <h2>🏫 Hỗ trợ học đường</h2>
+
     <p>Bạn có thể tìm sự hỗ trợ từ:</p>
+
     <ul>
       <li>Giáo viên chủ nhiệm hoặc giáo viên bộ môn.</li>
       <li>Phòng tư vấn tâm lý học đường của trường (nếu có).</li>
       <li>Cha mẹ hoặc người thân đáng tin cậy.</li>
       <li>Bạn bè tích cực và biết lắng nghe.</li>
     </ul>
+
     <p class="small">
       Bạn không cần phải tự giải quyết mọi khó khăn một mình.
     </p>
@@ -330,20 +499,28 @@ footer{
 
 <footer>
   <strong>HORMONY AI ✦</strong>
-  <p>Đồng hành cùng bạn trên hành trình học tập và trưởng thành 💜</p>
+
+  <p>
+    Đồng hành cùng bạn trên hành trình học tập và trưởng thành 💜
+  </p>
+
   <p>Phiên bản thử nghiệm dành cho dự án học tập.</p>
 </footer>
 
 <script>
-function showModule(id){
-  document.querySelectorAll('main .panel').forEach(p=>{
-    p.classList.add('hidden');
+
+// HIỂN THỊ CÁC CHỨC NĂNG
+
+function showModule(id) {
+  document.querySelectorAll('main .panel').forEach(panel => {
+    panel.classList.add('hidden');
   });
 
-  const panel=document.getElementById(id);
+  const panel = document.getElementById(id);
 
-  if(panel){
+  if (panel) {
     panel.classList.remove('hidden');
+
     panel.scrollIntoView({
       behavior:'smooth',
       block:'start'
@@ -351,69 +528,156 @@ function showModule(id){
   }
 }
 
-function askStudy(){
-  const q=document.getElementById('studyQuestion').value.trim();
-  const answer=document.getElementById('studyAnswer');
 
-  answer.textContent=q
-    ?'Bạn đã gửi câu hỏi: "'+q+'"\n\nĐây là bản minh họa giao diện. Hệ thống chưa kết nối AI thật nên chưa thể tạo lời giải tự động.'
-    :'Bạn hãy nhập câu hỏi trước nhé!';
+// TRỢ LÝ HỌC TẬP - KẾT NỐI GEMINI AI
+
+async function askStudy() {
+  const question = document
+    .getElementById('studyQuestion')
+    .value.trim();
+
+  const answer = document.getElementById('studyAnswer');
+  const button = document.getElementById('studyButton');
+
+  if (!question) {
+    answer.textContent = 'Bạn hãy nhập câu hỏi trước nhé!';
+    return;
+  }
+
+  answer.textContent = '🌈 HORMONY AI đang suy nghĩ...';
+  button.disabled = true;
+  button.textContent = 'Đang xử lý...';
+
+  try {
+    const formData = new FormData();
+
+    formData.append('question', question);
+
+    const response = await fetch('/api/ask', {
+      method:'POST',
+      body:formData
+    });
+
+    let data;
+
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error('Máy chủ trả về dữ liệu không hợp lệ.');
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || 'Máy chủ AI đang gặp lỗi.'
+      );
+    }
+
+    answer.textContent =
+      data.answer || 'AI chưa trả về câu trả lời.';
+
+  } catch (error) {
+    console.error('Study AI error:', error);
+
+    answer.textContent =
+      'Không kết nối được với AI.\n\n' +
+      'Chi tiết: ' + error.message +
+      '\n\nBạn hãy thử lại sau nhé!';
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Gửi câu hỏi ✨';
+  }
 }
-function checkMood(){
+
+
+// CHĂM SÓC TINH THẦN
+
+function checkMood() {
   const mood = document.getElementById('mood').value;
-  const note = document.getElementById('moodNote').value.trim();
+
+  const note = document
+    .getElementById('moodNote')
+    .value.trim();
+
   const answer = document.getElementById('moodAnswer');
 
   const messages = {
-    'Vui vẻ': 'Thật tuyệt! Hãy lưu giữ năng lượng tích cực nhé.',
-    'Bình thường': 'Một ngày bình thường cũng rất ổn. Hãy dành thời gian cho điều bạn yêu thích.',
-    'Căng thẳng': 'Bạn có thể nghỉ ngắn và chia nhỏ công việc để dễ bắt đầu hơn.',
-    'Buồn hoặc mệt mỏi': 'Hãy cho bản thân thời gian nghỉ ngơi và tâm sự với người lớn đáng tin cậy nhé.'
+    'Vui vẻ':
+      'Thật tuyệt! Hãy lưu giữ năng lượng tích cực nhé.',
+
+    'Bình thường':
+      'Một ngày bình thường cũng rất ổn. Hãy dành thời gian cho điều bạn yêu thích.',
+
+    'Căng thẳng':
+      'Bạn có thể nghỉ ngắn và chia nhỏ công việc để dễ bắt đầu hơn.',
+
+    'Buồn hoặc mệt mỏi':
+      'Hãy cho bản thân thời gian nghỉ ngơi và tâm sự với người lớn đáng tin cậy nhé.'
   };
 
   answer.textContent = note
-    ? `Mình đã ghi nhận: ${mood}.\nBạn chia sẻ: ${note}\n\n${messages[mood]}`
-    : `Mình đã ghi nhận cảm xúc: ${mood}.\n\n${messages[mood]}`;
+    ? 'Mình đã ghi nhận: ' + mood +
+      '\nBạn chia sẻ: ' + note +
+      '\n\n' + messages[mood]
+    : 'Mình đã ghi nhận cảm xúc: ' + mood +
+      '\n\n' + messages[mood];
 }
- function addTask(){
-  const input=document.getElementById('taskName');
-  const name=input.value.trim();
 
-  if(!name){
+
+// THÊM CÔNG VIỆC
+
+function addTask() {
+  const input = document.getElementById('taskName');
+
+  const name = input.value.trim();
+
+  if (!name) {
     alert('Bạn hãy nhập tên công việc nhé!');
     return;
   }
 
-  const item=document.createElement('div');
-  item.className='task';
+  const item = document.createElement('div');
+  item.className = 'task';
 
-  const check=document.createElement('input');
-  check.type='checkbox';
-  check.addEventListener('change',updateProgress);
+  const check = document.createElement('input');
+  check.type = 'checkbox';
+  check.addEventListener('change', updateProgress);
 
-  const label=document.createElement('span');
-  label.textContent=name;
+  const label = document.createElement('span');
+  label.textContent = name;
 
-  item.append(check,label);
+  item.append(check, label);
+
   document.getElementById('taskList').append(item);
 
-  input.value='';
+  input.value = '';
+
   updateProgress();
 }
 
-function updateProgress(){
-  const checks=[
-    ...document.querySelectorAll('#taskList input[type=checkbox]')
+
+// CẬP NHẬT TIẾN ĐỘ
+
+function updateProgress() {
+  const checks = [
+    ...document.querySelectorAll(
+      '#taskList input[type=checkbox]'
+    )
   ];
 
-  const done=checks.filter(c=>c.checked).length;
-  const percent=checks.length ? done/checks.length*100 : 0;
+  const done = checks.filter(check => check.checked).length;
 
-  document.getElementById('progressFill').style.width=percent+'%';
+  const percent = checks.length
+    ? done / checks.length * 100
+    : 0;
 
-  document.getElementById('progressText').textContent=
-    done+'/'+checks.length+' công việc hoàn thành';
+  document.getElementById('progressFill').style.width =
+    percent + '%';
+
+  document.getElementById('progressText').textContent =
+    done + '/' + checks.length +
+    ' công việc hoàn thành';
 }
+
 </script>
 
 </body>
