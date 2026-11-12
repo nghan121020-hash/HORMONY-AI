@@ -1,273 +1,187 @@
-
 require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
-const cors = require("cors");
 const multer = require("multer");
 
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
-const MODEL = "gemini-3.5-flash";
+const PORT = process.env.PORT || 3000;
+
+// Chuyển sang model nhẹ, ưu tiên tốc độ.
+const MODEL = "gemini-3.5-flash-lite";
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024, files: 1 },
-  fileFilter: (req, file, callback) => {
-    if (!file.mimetype || !file.mimetype.startsWith("image/")) {
-      return callback(new Error("Chỉ chấp nhận tệp hình ảnh."));
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype && file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Chỉ chấp nhận ảnh."));
     }
-    callback(null, true);
   }
 });
 
-app.use(cors());
 app.use(express.json({ limit: "20kb" }));
 
-// Mở trang chủ từ index.html.
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-function isTemporaryError(error) {
-  const status = Number(error.status || error.code);
-  const message = String(error.message || "");
+let ai;
 
-  return [429, 500, 502, 503, 504].includes(status) ||
-    /UNAVAILABLE|RESOURCE_EXHAUSTED|high demand|temporarily unavailable/i.test(message);
-}
+async function generateWithRetry(contents) {
+  if (!ai) throw new Error("Server chưa nhận được GEMINI_API_KEY.");
 
-function getErrorStatus(error) {
-  const status = Number(error.status || error.code);
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    let timer;
 
-  if (status === 429) return 429;
-  if ([500, 502, 503, 504].includes(status)) return 503;
+    try {
+      const request = ai.models.generateContent({
+        model: MODEL,
+        contents
+      });
 
-  if (/UNAVAILABLE|high demand/i.test(String(error.message || ""))) {
-    return 503;
-  }
+      const timeout = new Promise((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error("Gemini phản hồi quá lâu. Hãy thử lại.")),
+          30000
+        );
+      });
 
-  return 500;
-}
+      const result = await Promise.race([request, timeout]);
+      return result.text || "Mình chưa tạo được câu trả lời. Bạn thử lại nhé!";
+    } catch (error) {
+      console.error(`Gemini lỗi lần ${attempt}:`, error.message);
 
-function getErrorMessage(error) {
-  const status = getErrorStatus(error);
+      const temporary =
+        /429|500|502|503|504|UNAVAILABLE|RESOURCE_EXHAUSTED/i.test(error.message);
 
-  if (status === 503) {
-    return "Gemini đang quá tải. HORMONY AI đã thử lại nhưng chưa thành công. Bạn hãy đợi một lát rồi thử lại nhé!";
-  }
+      if (!temporary || attempt === 2) throw error;
 
-  if (status === 429) {
-    return "Gemini đang giới hạn số lượt yêu cầu. Bạn hãy đợi một lát rồi thử lại nhé!";
-  }
-
-  return "HORMONY AI đang gặp lỗi. Bạn hãy thử lại sau nhé!";
-}
-
-async function startServer() {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("Thiếu GEMINI_API_KEY trên Render.");
-  }
-
-  const { GoogleGenAI } = await import("@google/genai");
-
-  const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY
-  });
-
-  // Tự động thử lại khi Gemini gặp lỗi tạm thời.
-  async function generateWithRetry(contents) {
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        console.log(`Đang gửi yêu cầu Gemini, lần ${attempt}/3...`);
-
-        const result = await ai.models.generateContent({
-          model: MODEL,
-          contents
-        });
-
-        console.log("Gemini đã phản hồi thành công.");
-
-        return result.text ||
-          "Mình chưa tạo được câu trả lời. Bạn thử hỏi lại nhé!";
-
-      } catch (error) {
-        console.error(`Gemini lần ${attempt}/3:`, error.message);
-
-        if (!isTemporaryError(error) || attempt === 3) {
-          throw error;
-        }
-
-        const waitTime = attempt * 2000;
-
-        console.log(`Sẽ thử lại sau ${waitTime / 1000} giây...`);
-
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-      }
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    } finally {
+      clearTimeout(timer);
     }
   }
+}
 
-  // Kiểm tra server.
-  app.get("/api/health", (req, res) => {
-    res.json({
-      status: "ok",
-      app: "HORMONY AI"
-    });
-  });
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", app: "HORMONY AI" });
+});
 
-  // TRỢ LÝ HỌC TẬP.
-  app.post("/api/ask", upload.single("image"), async (req, res) => {
-    try {
-      const question = typeof req.body.question === "string"
-        ? req.body.question.trim()
-        : "";
+app.post("/api/ask", upload.single("image"), async (req, res) => {
+  try {
+    const question = (req.body.question || "").trim();
+    const imageFile = req.file;
 
-      const imageFile = req.file;
-
-      if (!question && !imageFile) {
-        return res.status(400).json({
-          error: "Bạn hãy nhập câu hỏi hoặc chọn ảnh đề bài nhé!"
-        });
-      }
-
-      if (question.length > 2000) {
-        return res.status(400).json({
-          error: "Câu hỏi tối đa 2000 ký tự."
-        });
-      }
-
-      const parts = [{
-        text: `Bạn là HORMONY AI, trợ lý học tập thân thiện dành cho học sinh.
-
-NHIỆM VỤ:
-1. Hỗ trợ Toán, Ngữ văn, Tiếng Anh, Vật lý và các môn học khác.
-2. Giải thích từng bước bằng ngôn ngữ đơn giản.
-3. Với Toán và Vật lý, nêu công thức, thay số và cách tính.
-4. Với Tiếng Anh, hỗ trợ dịch, từ vựng và ngữ pháp.
-5. Với Ngữ văn, trình bày rõ ý và có bố cục.
-6. Nếu ảnh mờ hoặc thiếu dữ kiện, hãy nói rõ.
-7. Khuyến khích học sinh hiểu cách làm.
-
-Trả lời bằng tiếng Việt, trình bày rõ ràng.
-
-${question
-  ? `CÂU HỎI CỦA HỌC SINH:\n${question}`
-  : "Học sinh chỉ gửi ảnh đề bài. Hãy đọc ảnh và hỗ trợ giải bài."
-}`
-      }];
-
-      if (imageFile) {
-        parts.push({
-          inlineData: {
-            mimeType: imageFile.mimetype,
-            data: imageFile.buffer.toString("base64")
-          }
-        });
-      }
-
-      const answer = await generateWithRetry([
-        { role: "user", parts }
-      ]);
-
-      res.json({ answer });
-
-    } catch (error) {
-      console.error("Study API error:", error.message);
-
-      res.status(getErrorStatus(error)).json({
-        error: getErrorMessage(error)
+    if (!question && !imageFile) {
+      return res.status(400).json({
+        error: "Bạn hãy nhập câu hỏi hoặc chọn ảnh đề bài nhé!"
       });
     }
-  });
 
-  // GIA SƯ TIẾNG ANH.
-  app.post("/api/english", async (req, res) => {
-    try {
-      const question = typeof req.body.question === "string"
-        ? req.body.question.trim()
-        : "";
+    if (question.length > 2000) {
+      return res.status(400).json({
+        error: "Câu hỏi tối đa 2000 ký tự."
+      });
+    }
 
-      const requestedLevel = req.body.level;
+    const parts = [{
+      text: `Bạn là HORMONY AI, trợ lý học tập thân thiện dành cho học sinh.
+Hỗ trợ Toán, Văn, Anh, Lý và các môn học khác.
+Giải thích từng bước bằng tiếng Việt đơn giản, dễ hiểu.
+Với Toán và Lý, nêu công thức và cách tính.
+Với tiếng Anh, hỗ trợ dịch, từ vựng và ngữ pháp.
+Với Ngữ văn, trình bày rõ ý và có bố cục.
 
-      const level = ["A1", "A2", "B1", "B2"].includes(requestedLevel)
-        ? requestedLevel
-        : "A2";
+Câu hỏi của học sinh:
+${question || "Hãy đọc ảnh đề bài và hướng dẫn giải."}`
+    }];
 
-      const requestedMode = req.body.mode;
+    if (imageFile) {
+      parts.push({
+        inlineData: {
+          mimeType: imageFile.mimetype,
+          data: imageFile.buffer.toString("base64")
+        }
+      });
+    }
 
-      if (!question) {
-        return res.status(400).json({
-          error: "Bạn hãy nhập nội dung muốn học nhé!"
-        });
-      }
+    const answer = await generateWithRetry([
+      { role: "user", parts }
+    ]);
 
-      if (question.length > 2000) {
-        return res.status(400).json({
-          error: "Nội dung tối đa 2000 ký tự."
-        });
-      }
+    res.json({ answer });
+  } catch (error) {
+    console.error("Study API:", error.message);
 
-      const modes = {
-        conversation: "Trò chuyện tiếng Anh tự nhiên, mỗi lượt chỉ đặt một câu hỏi.",
-        grammar: "Sửa lỗi ngữ pháp, viết câu đúng và giải thích bằng tiếng Việt.",
-        vocabulary: "Dạy 5 từ vựng, nghĩa tiếng Việt và ví dụ đơn giản.",
-        translation: "Dịch Anh-Việt hoặc Việt-Anh và giải thích cấu trúc câu.",
-        speaking: "Tạo bài luyện nói, câu hỏi và gợi ý câu trả lời."
-      };
+    const status = /429|503|UNAVAILABLE|RESOURCE_EXHAUSTED/i.test(error.message)
+      ? 503
+      : 500;
 
-      const mode = modes[requestedMode]
-        ? requestedMode
-        : "conversation";
+    res.status(status).json({
+      error: "AI chưa trả lời được: " + error.message
+    });
+  }
+});
 
-      const answer = await generateWithRetry(`
-Bạn là gia sư tiếng Anh thân thiện dành cho học sinh.
+app.post("/api/english", async (req, res) => {
+  try {
+    const { question, level = "A2", mode = "conversation" } = req.body;
 
+    if (!question || !question.trim()) {
+      return res.status(400).json({
+        error: "Bạn hãy nhập nội dung muốn học nhé!"
+      });
+    }
+
+    const modes = {
+      conversation: "Trò chuyện tiếng Anh, mỗi lượt đặt một câu hỏi ngắn.",
+      grammar: "Sửa lỗi ngữ pháp và giải thích bằng tiếng Việt.",
+      vocabulary: "Dạy 5 từ vựng, nghĩa và ví dụ đơn giản.",
+      translation: "Dịch và giải thích từ vựng, cấu trúc câu."
+    };
+
+    const answer = await generateWithRetry(`
+Bạn là gia sư tiếng Anh thân thiện.
 Trình độ: ${level}.
-Chế độ: ${modes[mode]}
-
-Dùng từ vựng phù hợp trình độ.
+Nhiệm vụ: ${modes[mode] || modes.conversation}
 Giải thích đơn giản bằng tiếng Việt.
 
-NỘI DUNG HỌC SINH GỬI:
+Nội dung học sinh gửi:
 ${question}
 `);
 
-      res.json({ answer });
+    res.json({ answer });
+  } catch (error) {
+    console.error("English API:", error.message);
+    res.status(503).json({
+      error: "Gia sư tiếng Anh chưa trả lời được: " + error.message
+    });
+  }
+});
 
-    } catch (error) {
-      console.error("English API error:", error.message);
+app.use((error, req, res, next) => {
+  console.error("Server error:", error.message);
+  res.status(400).json({ error: error.message });
+});
 
-      res.status(getErrorStatus(error)).json({
-        error: getErrorMessage(error)
-      });
-    }
-  });
-
-  // Xử lý lỗi tải ảnh.
-  app.use((error, req, res, next) => {
-    if (error instanceof multer.MulterError) {
-      const message = error.code === "LIMIT_FILE_SIZE"
-        ? "Ảnh quá lớn. Vui lòng chọn ảnh dưới 5 MB."
-        : "Không thể tải ảnh lên. Vui lòng thử lại.";
-
-      return res.status(400).json({ error: message });
-    }
-
-    if (error) {
-      return res.status(400).json({
-        error: error.message || "Dữ liệu không hợp lệ."
-      });
-    }
-
-    next();
-  });
+async function startServer() {
+  if (process.env.GEMINI_API_KEY) {
+    const { GoogleGenAI } = await import("@google/genai");
+    ai = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY
+    });
+  }
 
   app.listen(PORT, () => {
-    console.log(`HORMONY AI đang chạy tại cổng ${PORT}`);
+    console.log("HORMONY AI đang chạy ở cổng " + PORT);
+    console.log("Model đang dùng: " + MODEL);
   });
 }
 
 startServer().catch(error => {
-  console.error("Không thể khởi động HORMONY AI:", error.message);
+  console.error("Không thể khởi động:", error.message);
   process.exit(1);
 });
